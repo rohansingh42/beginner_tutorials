@@ -1,34 +1,32 @@
 /**
- * Copyright (C) 2008, Morgan Quigley and Willow Garage, Inc.
+ *  MIT License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the names of Stanford University or Willow Garage, Inc. nor the names of its
- *     contributors may be used to endorse or promote products derived from
- *     this software without specific prior written permission.
+ *  Copyright (c) 2019 Rohan Singh
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ *  Permission is hereby granted, free of charge, to any person obtaining a
+ *  copy of this software and associated documentation files (the "Software"),
+ *  to deal in the Software without restriction, including without
+ *  limitation the rights to use, copy, modify, merge, publish, distribute,
+ *  sublicense, and/or sell copies of the Software, and to permit persons to
+ *  whom the Software is furnished to do so, subject to the following
+ *  conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included
+ *  in all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ *  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *  DEALINGS IN THE SOFTWARE.
  */
 
  /**
  * @file      talker.cpp
  * @author    Rohan Singh
- * @copyright Copyright (C) 2008, Morgan Quigley and Willow Garage, Inc.
+ * @copyright MIT License
  * @brief     Publisher node
  */
 
@@ -49,13 +47,17 @@ extern std::string str = "Default String";
  *
  * @return Returns true on execution
  */
-bool concatStringsCallback(beginner_tutorials::ConcatStrings::Request &req,
-       beginner_tutorials::ConcatStrings::Response &res) {
+bool concatStringsCallback(
+       beginner_tutorials::ConcatStrings::Request &req,       // NOLINT
+       beginner_tutorials::ConcatStrings::Response &res) {    // NOLINT
+  if (req.first.empty() || req.second.empty()) {
+    ROS_WARN_STREAM("Atleast one input string is empty.");
+  }
   /* Add the 2 strings */
   res.resultString = req.first + req.second;
-  ROS_INFO("request: first=%s, second=%s",
-             req.first.c_str(), req.second.c_str());
-  ROS_INFO("sending back response: [%s]", res.resultString.c_str());
+  ROS_INFO_STREAM("Request: first = " << req.first.c_str());
+  ROS_INFO_STREAM("Request: second = " << req.second.c_str());
+  ROS_INFO_STREAM("Sending back response: " << res.resultString.c_str());
   str = res.resultString;
   return true;
 }
@@ -76,6 +78,24 @@ int main(int argc, char **argv) {
    */
   ros::init(argc, argv, "talker");
 
+  /* Define default publisher frequency */
+  int pubHz = 20;
+
+  /* Check for input arguments */
+  if (argc > 2) {
+    ROS_WARN_STREAM("Too many input arguments."
+                     << "Considering only first argument.");
+  } else if (argc == 2) {
+    pubHz = atoi(argv[1]);
+    if (pubHz <= 0) {
+      ROS_ERROR_STREAM("Incorrect value for publisher frequency.");
+      pubHz = 20;
+    }
+  } else {
+    ROS_WARN_STREAM("Using default publisher frequency.");
+  }
+
+  ROS_DEBUG_STREAM("Publisher frequency set to : " << pubHz);
   /**
    * NodeHandle is the main access point to communications with the ROS system.
    * The first NodeHandle constructed will fully initialize this node, and the last
@@ -90,22 +110,21 @@ int main(int argc, char **argv) {
   ros::ServiceServer concatStringService =
          n.advertiseService("concatStringService", concatStringsCallback);
 
-  ros::Rate loopRate(10);
+  ros::Rate loopRate(pubHz);
 
-  /**
-   * A count of how many messages we have sent. This is used to create
-   * a unique string for each message.
-   */
-  int count = 0;
+  if (!ros::ok()) {
+    ROS_FATAL_STREAM("ROS node is not running.");
+  }
   while (ros::ok()) {
-    /**
-     * This is a message object. You stuff it with data, and then publish it.
-     */
+    if (pubHz < 10) {
+      ROS_WARN_STREAM("Publishing frequency too low.");
+    }
+    /* String Message object */
     std_msgs::String msg;
 
     msg.data = str;
 
-    ROS_INFO("%s", msg.data.c_str());
+    ROS_INFO_STREAM("Concatenated String : " << msg.data.c_str());
 
     /* Publish updated message */
     chatterPub.publish(msg);
@@ -113,7 +132,6 @@ int main(int argc, char **argv) {
     ros::spinOnce();
 
     loopRate.sleep();
-    ++count;
   }
   return 0;
 }
