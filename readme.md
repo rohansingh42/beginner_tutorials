@@ -6,7 +6,7 @@
 This project shows the development of basic publisher and subscriber nodes in ROS. The process is followed as given on the ROS wiki: http://wiki.ros.org/ROS/Tutorials
 
 The model has two nodes:
-1. Talker - src/talker.cpp (Publisher)
+1. Talker - src/talker.cpp (Publisher and Service Node)
 2. Listener - src/listener.cpp (Subscriber)
 
 
@@ -57,3 +57,14 @@ rosrun beginner_tutorials listener
 ```
 rostopic echo /chatter
 ```
+
+- To run both nodes with Publishing frequency as argument,
+```
+roslaunch beginner_tutorials allNodes.launch pubHz:=<Publishing frequency>
+```
+
+- To use the ConcatStrings service, type in a new terminal while the talker node is running,
+```
+rosservice call /concatStringService "first: '<string 1>' second: '<string2>'" 
+```
+The talker node will publish the concatenated string.
