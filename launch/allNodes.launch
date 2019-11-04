@@ -1,0 +1,24 @@
+<launch>
+
+  <arg 
+    name="pubHz" 
+    default="20" 
+  />
+
+  <node 
+    pkg="beginner_tutorials" 
+    name="talker" 
+    type="talker"
+    output="screen"
+    args= "$(arg pubHz)"
+  />
+
+  <node
+    pkg="beginner_tutorials"
+    name="listener"
+    type="listener"
+    output="screen"
+    launch-prefix="gnome-terminal --command"
+  />
+
+</launch>
