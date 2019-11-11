@@ -5,6 +5,11 @@
     default="20" 
   />
 
+  <arg
+    name="record"
+    default="false"
+  />
+
   <node 
     pkg="beginner_tutorials" 
     name="talker" 
@@ -21,4 +26,12 @@
     launch-prefix="gnome-terminal --command"
   />
 
+  <node
+    pkg="beginner_tutorials"
+    name="record"
+    type="record"
+    args="-a -o $(find beginner_tutorials)/results/allNodesRecord"
+    if="$(arg record)"
+  />
 </launch>
+
