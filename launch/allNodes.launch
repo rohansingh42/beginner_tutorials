@@ -27,7 +27,7 @@
   />
 
   <node
-    pkg="beginner_tutorials"
+    pkg="rosbag"
     name="record"
     type="record"
     args="-a -o $(find beginner_tutorials)/results/allNodesRecord"
