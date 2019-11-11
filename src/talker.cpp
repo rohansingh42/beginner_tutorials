@@ -81,12 +81,12 @@ int main(int argc, char **argv) {
 
   /* tf Broadcaster Object */
   static tf::TransformBroadcaster br;
-  
+
   /* Trnsformation object */
   tf::Transform transform;
 
   /* Set transformation matrix */
-  transform.setOrigin( tf::Vector3(1.0, 1.0, 1.0) );
+  transform.setOrigin(tf::Vector3(1.0, 1.0, 1.0));
   tf::Quaternion q;
   q.setRPY(0, 0, 90);
   transform.setRotation(q);
@@ -143,7 +143,8 @@ int main(int argc, char **argv) {
     chatterPub.publish(msg);
 
     /* Broadast transformation */
-    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "talk"));
+    br.sendTransform(tf::StampedTransform(transform,
+        ros::Time::now(), "world", "talk"));
 
     ros::spinOnce();
 
