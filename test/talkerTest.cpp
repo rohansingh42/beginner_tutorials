@@ -40,13 +40,12 @@
  * @brief Test to check functionality of service ConcatStrings
  */
 TEST(TESTSuite, TestConcatStrings) {
-
   /* Create node handle */
   ros::NodeHandle n;
 
   /* Create service client */
-  ros::ServiceClient client = n.serviceClient<beginner_tutorials::ConcatStrings>(
-        "concatStringService");
+  ros::ServiceClient client = n.serviceClient
+    <beginner_tutorials::ConcatStrings>("concatStringService");
 
   /* Check if sevice exists */
   bool exists(client.waitForExistence(ros::Duration(1)));
