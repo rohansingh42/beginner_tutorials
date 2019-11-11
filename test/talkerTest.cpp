@@ -33,24 +33,29 @@
 #include <gtest/gtest.h>
 
 #include "ros/ros.h"
+#include "ros/service_client.h"
+#include "beginner_tutorials/ConcatStrings.h"
 
+/**
+ * @brief Test to check functionality of service ConcatStrings
+ */
 TEST(TESTSuite, TestConcatStrings) {
 
   /* Create node handle */
   ros::NodeHandle n;
 
   /* Create service client */
-  ros::ServiceClient client = n->serviceClient<beginner_tutorials::ConcatStrings>(
+  ros::ServiceClient client = n.serviceClient<beginner_tutorials::ConcatStrings>(
         "concatStringService");
 
   /* Check if sevice exists */
   bool exists(client.waitForExistence(ros::Duration(1)));
-  EXPECT_EQ(exists);
+  EXPECT_TRUE(exists);
 
   /* Test output of service */
   beginner_tutorials::ConcatStrings srv;
   srv.request.first = "Hello ";
   srv.request.second = "World";
   client.call(srv);
-  EXPECT_STREQ(srv.response.resultString, srv.request.first + srv.request.second);
+  EXPECT_STREQ("Hello World", srv.response.resultString.c_str());
 }
