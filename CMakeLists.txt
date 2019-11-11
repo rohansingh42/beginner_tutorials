@@ -214,3 +214,23 @@ add_dependencies(listener beginner_tutorials_generate_messages_cpp)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+
+  add_rostest_gtest(
+  talkerTest
+  test/allTests.launch
+  test/main.cpp
+  test/talkerTest.cpp
+  )
+  target_link_libraries(
+  talkerTest
+  ${catkin_LIBRARIES}
+  )
+  add_dependencies(
+  talkerTest
+  talker
+  ${catkin_EXPORTED_TARGETS}
+  )
+endif()
