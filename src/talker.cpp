@@ -33,6 +33,7 @@
 #include <sstream>
 #include <functional>
 
+#include "tf/transform_broadcaster.h"
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "beginner_tutorials/ConcatStrings.h"
@@ -77,6 +78,18 @@ int main(int argc, char **argv) {
    * part of the ROS system.
    */
   ros::init(argc, argv, "talker");
+
+  /* tf Broadcaster Object */
+  static tf::TransformBroadaster br;
+  
+  /* Trnsformation object */
+  tf::Transform transform;
+
+  /* Set transformation matrix */
+  transform.setOrigin( tf::Vector3(1.0, 1.0, 1.0) );
+  tf::Quaternion q;
+  q.setRPY(0, 0, 90);
+  transform.setRotation(q);
 
   /* Define default publisher frequency */
   int pubHz = 20;
@@ -128,6 +141,9 @@ int main(int argc, char **argv) {
 
     /* Publish updated message */
     chatterPub.publish(msg);
+
+    /* Broadast transformation */
+    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "talk"));
 
     ros::spinOnce();
 
