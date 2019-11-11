@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "talker");
 
   /* tf Broadcaster Object */
-  static tf::TransformBroadaster br;
+  static tf::TransformBroadcaster br;
   
   /* Trnsformation object */
   tf::Transform transform;
